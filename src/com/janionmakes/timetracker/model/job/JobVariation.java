@@ -1,17 +1,17 @@
 package com.janionmakes.timetracker.model.job;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class JobVariation {
 
-    private Date startDate;
+    private LocalDate startDate;
     private double fte;
     
-    public JobVariation(Date startDate, double fte) {
+    public JobVariation(LocalDate startDate, double fte) {
         this.startDate = startDate;
         this.fte = fte;
     }
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
     public double getFte() {

@@ -1,0 +1,6 @@
+- Mid week variations need to be handled for weekly hours
+- Variations need to be handled for annual leave allowance
+- Annual leave period (Calendar year, tax year, start date)
+- Part timers only working on set days will affect remaining hours per day calculations
+- Handle missed days by inserting zero hour days
+- Handle days until end of week for expected days calculation
