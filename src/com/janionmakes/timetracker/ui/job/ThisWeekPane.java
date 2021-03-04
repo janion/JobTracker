@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import com.janionmakes.timetracker.analysis.job.JobAnalysis;
 import com.janionmakes.timetracker.ui.HoursFormatter;
+import com.janionmakes.timetracker.ui.utility.LayoutUtility;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -21,8 +22,11 @@ public class ThisWeekPane {
     public ThisWeekPane(JobAnalysis analysis) {
 
         // Progress bar
-        HBox progressBox = new HBox(new Label("Progress: "),
-                new ProgressBar(analysis.getCompletedHoursThisWeek() / analysis.getExpectedHoursThisWeek()));
+        ProgressBar progressBar = new ProgressBar(analysis.getCompletedHoursThisWeek() / analysis.getExpectedHoursThisWeek());
+        HBox hbox = new HBox(progressBar);
+        progressBar.prefWidthProperty().bind(hbox.widthProperty());
+        BorderPane progressBox = new BorderPane(hbox);
+        progressBox.setLeft(new Label("Progress: "));
 
         // Completed hours box
         Label completedHours = new Label(
@@ -31,18 +35,18 @@ public class ThisWeekPane {
         HBox completedHoursBox = new HBox(completedHours);
 
         // Hours box
-        Label remainingHours = new Label(String.format("%s hours remaining (%s per day)",
-                formatter.formatHours(analysis.getRemainingHoursThisWeek()),
+        Label remainingHours = new Label(String.format("%s hours remaining",
+                formatter.formatHours(analysis.getRemainingHoursThisWeek())));
+        Label remainingHoursPerDay = new Label(String.format("(%s per day)",
                 formatter.formatHours(analysis.getRemainingHoursPerDayThisWeek())));
-        // Maybe change to border pane or use expansion trick
-        HBox remainingHoursBox = new HBox(remainingHours);
+        HBox remainingHoursBox = LayoutUtility.separateNodesHorizontally(remainingHours, remainingHoursPerDay);
 
         // Imbalance box
         BorderPane imbalanceBox = new BorderPane();
         imbalanceBox.setTop(new Label("Imbalance:"));
         VBox imbalances = new VBox();
         Map<String, Double> imbalanceMap = analysis.getImbalances();
-        if (!imbalanceMap.isEmpty()) {
+        if (analysis.getJob().getWorkpackages().size() > 1) {
             for (Entry<String, Double> entry : imbalanceMap.entrySet()) {
                 HBox row = new HBox(new Label(entry.getKey()), new Label(formatter.formatHours(entry.getValue())));
                 imbalances.getChildren().add(row);
@@ -50,12 +54,13 @@ public class ThisWeekPane {
         } else {
             imbalances.getChildren().add(new Label("No imbalnce in work packages."));
         }
+        imbalanceBox.setBottom(imbalances);
 
         VBox vbox = new VBox(progressBox, completedHoursBox, remainingHoursBox);
-        if (!analysis.getJob().getWorkpackages().isEmpty()) {
+        if (analysis.getJob().getWorkpackages().size() > 1) {
             vbox.getChildren().add(imbalanceBox);
         }
-        node = new TitledPane("This Week", vbox);
+        node = new TitledPane("This Week", new BorderPane(vbox));
     }
 
     public TitledPane getNode() {

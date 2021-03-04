@@ -14,8 +14,9 @@ public class Job {
     private List<Workpackage> workpackages;
     private List<JobVariation> variations;
     private List<WorkDay> workDays;
-    
+
     private boolean daysSorted;
+    private boolean variationsSorted;
 
     public Job(String name, double weeklyHours, int annualLeaveAllowance, JobVariation startingVariation) {
         this(name, weeklyHours, annualLeaveAllowance, Collections.emptyList(), Collections.singletonList(startingVariation), Collections.emptyList());
@@ -28,7 +29,9 @@ public class Job {
         this.workpackages = new ArrayList<>(workpackages);
         this.variations = new ArrayList<>(variations);
         this.workDays = new ArrayList<>(workDays);
+        
         daysSorted = false;
+        variationsSorted = false;
     }
 
     public String getName() {
@@ -48,12 +51,17 @@ public class Job {
     }
     
     public List<JobVariation> getVariations() {
+        if (!variationsSorted) {
+            variations.sort(Comparator.comparing(JobVariation::getStartDate));
+            variationsSorted = true;
+        }
         return new ArrayList<>(variations);
     }
     
-    public List<WorkDay> getWorkDays() {
+    public List<WorkDay> getSortedWorkDays() {
         if (!daysSorted) {
             workDays.sort(Comparator.comparing(WorkDay::getDate));
+            daysSorted = true;
         }
         return new ArrayList<>(workDays);
     }
@@ -63,6 +71,7 @@ public class Job {
     }
 
     public void addVariation(JobVariation variation) {
+        variationsSorted = false;
         variations.add(variation);
     }
 
